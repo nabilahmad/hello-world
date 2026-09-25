@@ -1,0 +1,62 @@
+# Builds installers for Windows, macOS and Linux. Run it from the Actions tab,
+# or push a tag like `dxf-viewer-v0.1.0` to also create a draft GitHub release.
+name: dxf-viewer installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['dxf-viewer-v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ''
+            bundle: src-tauri/target/release/bundle
+          - platform: macos-latest
+            args: --target universal-apple-darwin
+            bundle: src-tauri/target/universal-apple-darwin/release/bundle
+          - platform: ubuntu-22.04
+            args: ''
+            bundle: src-tauri/target/release/bundle
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dxf-viewer/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'dxf-viewer/src-tauri -> target'
+      - name: Linux packages
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - run: npm ci
+        working-directory: dxf-viewer
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: dxf-viewer
+          args: ${{ matrix.args }}
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          releaseName: DXF Viewer ${{ github.ref_name }}
+          releaseDraft: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dxf-viewer-${{ matrix.platform }}
+          path: dxf-viewer/${{ matrix.bundle }}
+          if-no-files-found: error

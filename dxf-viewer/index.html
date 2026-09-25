@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>DXF Viewer</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header id="tabbar">
+      <div id="tabs" role="tablist" aria-label="Open drawings"></div>
+      <button id="btn-open" class="icon-btn" title="Open DXF… (Ctrl+O)" aria-label="Open DXF">
+        <svg viewBox="0 0 20 20" width="18" height="18"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+      </button>
+      <div class="spacer"></div>
+      <div class="toolbar">
+        <button id="btn-fit" class="icon-btn" title="Fit drawing (F, double-click)" aria-label="Fit drawing">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4" /><rect x="7" y="7" width="6" height="6" rx="1" /></svg>
+        </button>
+        <button id="btn-dims" class="icon-btn toggle" title="Bounding-box dimensions (D)" aria-label="Bounding-box dimensions">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="8" rx="1" stroke-dasharray="2 2" /><path d="M3 15.5h10M3 13.5v4M13 13.5v4M16.5 3v8M14.5 3h4M14.5 11h4" /></svg>
+        </button>
+        <button id="btn-layers" class="icon-btn toggle" title="Layers (L)" aria-label="Layers">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M10 3l7 4-7 4-7-4z" /><path d="M3 10.5l7 4 7-4M3 14l7 4 7-4" /></svg>
+        </button>
+        <button id="btn-theme" class="icon-btn" title="Light / dark background" aria-label="Toggle theme">
+          <svg viewBox="0 0 20 20" width="18" height="18"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor" /></svg>
+        </button>
+      </div>
+    </header>
+    <div id="main">
+      <main id="stage">
+        <div id="empty" class="placeholder" hidden>
+          <div class="empty-card">
+            <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M16 8h22l12 12v36H16z" /><path d="M38 8v12h12" /><path d="M23 46l8-12 10 12z" /><circle cx="31" cy="42" r="2.5" /></svg>
+            <h1>Open a DXF drawing</h1>
+            <p>Drop files here, or</p>
+            <button id="btn-empty-open" class="primary">Open DXF… <kbd id="empty-shortcut"></kbd></button>
+            <p class="hint">Hover lines and arcs to measure them · Wheel to zoom · Drag to pan</p>
+          </div>
+        </div>
+        <div id="loading" class="placeholder" hidden>
+          <div class="spinner"></div>
+          <span>Opening <span id="loading-name"></span>…</span>
+        </div>
+        <div id="error" class="placeholder" hidden><span id="error-text"></span></div>
+        <div id="drop-overlay" hidden><div>Drop DXF files to open them here</div></div>
+      </main>
+      <aside id="layers-panel" hidden></aside>
+    </div>
+    <footer id="status">
+      <span id="st-cursor" class="mono"></span>
+      <span id="st-extents" class="mono" title="Bounding box: width × height"></span>
+      <span class="grow"></span>
+      <label class="st-check" title="Measure the bounding box including text and dimensions"><input type="checkbox" id="chk-annot" /> Text &amp; dims in box</label>
+      <select id="sel-units" title="Display units"><option value="0">Drawing</option></select>
+      <select id="sel-prec" title="Decimals"><option value="-1">Auto</option></select>
+      <span id="st-zoom" class="mono" title="Zoom relative to fit"></span>
+      <span id="st-info"></span>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

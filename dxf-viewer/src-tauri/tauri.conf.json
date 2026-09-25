@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "DXF Viewer",
+  "version": "0.1.0",
+  "identifier": "io.github.nabilahmad.dxfviewer",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; worker-src 'self' blob:",
+      "devCsp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Graphics",
+    "shortDescription": "Lightweight DXF viewer",
+    "longDescription": "Fast DXF viewer with bounding-box dimensions, hover measurements of lines and arcs, and tabs that can be dragged between windows.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["dxf"],
+        "name": "DXF Drawing",
+        "description": "AutoCAD Drawing Exchange Format",
+        "role": "Viewer",
+        "mimeType": "image/vnd.dxf"
+      }
+    ]
+  }
+}

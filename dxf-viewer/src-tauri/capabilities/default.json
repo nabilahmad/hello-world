@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions for every viewer window (windows are created at runtime, one per file).",
+  "windows": ["*"],
+  "permissions": ["core:default", "core:window:allow-set-title"]
+}
