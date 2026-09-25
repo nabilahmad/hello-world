@@ -226,22 +226,23 @@ export class TabStrip {
 
   private reorderMove(e: PointerEvent): void {
     const d = this.drag!;
-    const els = [...this.el.querySelectorAll<HTMLElement>('.tab')];
-    const idx = els.indexOf(d.el);
-    const r = d.el.getBoundingClientRect();
-    const baseLeft = r.left - (parseFloat(d.el.dataset.dx || '0') || 0);
-    let dx = e.clientX - d.offX - baseLeft;
-    // Swap with a neighbour once the dragged tab passes its midpoint.
-    const prev = els[idx - 1];
-    const next = els[idx + 1];
-    if (prev && e.clientX - d.offX < prev.getBoundingClientRect().left + prev.offsetWidth / 2) {
-      this.el.insertBefore(d.el, prev);
-    } else if (next && e.clientX - d.offX + r.width > next.getBoundingClientRect().left + next.offsetWidth / 2) {
-      this.el.insertBefore(next, d.el);
+    const left = e.clientX - d.offX;
+    const width = d.el.getBoundingClientRect().width;
+    // Swap with neighbours while the dragged tab is past their midpoints.
+    for (let guard = 0; guard < this.tabs.length; guard++) {
+      const prev = d.el.previousElementSibling as HTMLElement | null;
+      const next = d.el.nextElementSibling as HTMLElement | null;
+      if (prev && left < prev.getBoundingClientRect().left + prev.offsetWidth / 2) {
+        this.el.insertBefore(d.el, prev);
+      } else if (next && left + width > next.getBoundingClientRect().left + next.offsetWidth / 2) {
+        this.el.insertBefore(next, d.el);
+      } else {
+        break;
+      }
     }
     const nr = d.el.getBoundingClientRect();
     const newBase = nr.left - (parseFloat(d.el.dataset.dx || '0') || 0);
-    dx = e.clientX - d.offX - newBase;
+    let dx = left - newBase;
     const strip = this.el.getBoundingClientRect();
     dx = Math.max(strip.left - newBase, Math.min(strip.right - newBase - nr.width, dx));
     d.el.dataset.dx = String(dx);

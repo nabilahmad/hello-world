@@ -126,3 +126,17 @@ test('toggles the dimension overlay and fits the view', async ({ page }) => {
   await page.keyboard.press('f');
   await expect(page.locator('#st-zoom')).toHaveText('100%');
 });
+
+test('reorders tabs by dragging', async ({ page }) => {
+  await open(page, sample('plate-mm.dxf'), sample('bracket-r12.dxf'), fixture('plate-bin.dxf'));
+  const names = () => page.locator('#tabs .tab .tab-name').allTextContents();
+  expect(await names()).toEqual(['plate-mm.dxf', 'bracket-r12.dxf', 'plate-bin.dxf']);
+  const first = await page.locator('#tabs .tab').first().boundingBox();
+  const last = await page.locator('#tabs .tab').last().boundingBox();
+  await page.mouse.move(first!.x + 20, first!.y + first!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(last!.x + last!.width - 10, first!.y + first!.height / 2, { steps: 12 });
+  await page.mouse.up();
+  expect(await names()).toEqual(['bracket-r12.dxf', 'plate-bin.dxf', 'plate-mm.dxf']);
+  await expect(page.locator('#tabs .tab.active .tab-name')).toHaveText('plate-mm.dxf');
+});

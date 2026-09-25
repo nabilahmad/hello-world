@@ -188,3 +188,28 @@ describe('geometry helpers', () => {
     }
   });
 });
+
+describe('robustness', () => {
+  it('caps oversized MINSERT arrays', () => {
+    const dxf = [
+      '0', 'SECTION', '2', 'BLOCKS',
+      '0', 'BLOCK', '2', 'B', '10', '0', '20', '0', '70', '0',
+      '0', 'LINE', '8', '0', '10', '0', '20', '0', '11', '1', '21', '0',
+      '0', 'ENDBLK',
+      '0', 'ENDSEC',
+      '0', 'SECTION', '2', 'ENTITIES',
+      '0', 'INSERT', '2', 'B', '10', '0', '20', '0', '70', '30000', '71', '30000', '44', '2', '45', '2',
+      '0', 'ENDSEC', '0', 'EOF', '',
+    ].join('\n');
+    const m = flatten(parseDxf(new TextEncoder().encode(dxf)));
+    expect(m.hits.count).toBeLessThanOrEqual(100_000);
+    expect(m.hits.count).toBeGreaterThan(1000);
+  });
+
+  it('survives truncated input', () => {
+    const bytes = readFileSync(new URL('../samples/plate-mm.dxf', import.meta.url));
+    for (const cut of [100, 5000, 20000, 30000]) {
+      expect(() => flatten(parseDxf(new Uint8Array(bytes.subarray(0, cut))))).not.toThrow();
+    }
+  });
+});

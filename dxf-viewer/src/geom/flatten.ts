@@ -99,6 +99,9 @@ class F64 {
 const HATCH_BUDGET = 1_500_000;
 const HATCH_BUDGET_EACH = 60_000;
 const MAX_DEPTH = 24;
+/** Upper bounds for MINSERT rows × columns, and for the entities they expand to. */
+const MAX_ARRAY_CELLS = 100_000;
+const MAX_ARRAY_ENTITIES = 2_000_000;
 
 interface Ctx {
   m: Mat;
@@ -876,8 +879,10 @@ class Flattener {
       const W = withOcs(ctx.m, e.extrusion);
       const base = mul(mul(W, translate(e.p.x, e.p.y, e.p.z)), rotateZ(e.rot * DEG));
       const tail = mul(scale(e.sx, e.sy, e.sz), translate(-blk.base.x, -blk.base.y, -blk.base.z));
-      const rows = Math.min(e.rows, 10000);
-      const cols = Math.min(e.cols, 10000);
+      // Guard against corrupt arrays (e.g. 10 000 × 10 000 copies of a big block).
+      const maxCells = Math.max(1, Math.min(MAX_ARRAY_CELLS, Math.floor(MAX_ARRAY_ENTITIES / blk.entities.length)));
+      const cols = Math.min(e.cols, maxCells);
+      const rows = Math.min(e.rows, Math.max(1, Math.floor(maxCells / cols)));
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const cell = r === 0 && c === 0 ? base : mul(base, translate(c * e.colSpacing, r * e.rowSpacing, 0));
