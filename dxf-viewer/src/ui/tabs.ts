@@ -73,7 +73,12 @@ export class TabStrip {
     el.addEventListener('contextmenu', (e) => {
       const tab = (e.target as HTMLElement).closest<HTMLElement>('.tab');
       e.preventDefault();
-      if (tab?.dataset.id) this.events.contextMenu(tab.dataset.id, e.clientX, e.clientY);
+      if (!tab?.dataset.id) return;
+      // The native path tooltip would pop up over the menu; restore it once the pointer leaves.
+      const title = tab.title;
+      tab.removeAttribute('title');
+      tab.addEventListener('pointerleave', () => (tab.title ||= title), { once: true });
+      this.events.contextMenu(tab.dataset.id, e.clientX, e.clientY);
     });
     el.addEventListener('dblclick', (e) => {
       if (!(e.target as HTMLElement).closest('.tab')) this.events.openFile();
